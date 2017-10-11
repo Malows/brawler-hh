@@ -2,7 +2,7 @@
 Modulo que maneja la extraccion de la cookie del archivo de recovery
 """
 
-from os import path, environ, listdir
+from os import path, listdir, environ
 import lz4
 from datos import SESSION_NAME, DOMAIN
 

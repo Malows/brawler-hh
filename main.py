@@ -52,6 +52,29 @@ def definir_oponente(conn=None):
             return enemy
 
 
+def reduce_arena_opponent_info(opponent):
+    href = opponent['href']
+    ego = opponent.find('div', class_='opponents_ego')
+    ego = ego.string.strip()
+    ego = ego.replace('Ego ','').replace(',','')
+    ego = int(ego)
+    return (ego, href)
+
+def definir_enemigo_arena(conn=None):
+    """ Si no encuentro trolles busco en la arena """
+    if not conn:
+        conn = HTTPConnection(DOMAIN)
+    headers = make_header('home.html', explorar=True)
+
+    conn.request('GET', '/arena.html', headers=headers)
+    descomprimido = respuesta_unzip_http(conn.getresponse())
+
+    soup = BeautifulSoup(descomprimido, 'html.parser')
+    guachos = soup.find_all('div', class_='sub_block one_opponent')
+    guachos = sorted(map(reduce_arena_opponent_info, guachos), key=lambda x: x[0])
+    return guachos[0]
+
+
 def pelear():
     """
     Funcion que pelea contra los trolls
@@ -85,4 +108,5 @@ def _dict(elem):
     return isinstance(elem, dict)
 
 
+print(definir_enemigo_arena())
 pelear()
