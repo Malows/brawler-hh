@@ -2,6 +2,7 @@
 Brawler Bot, para harem heroes, hecho en python 2.7 con el fin de reducir el tamanio del ejecutable
 Y que sea llamado stand-alone desde un crontable
 """
+from sys import argv
 from http.client import HTTPConnection
 from functools import reduce
 from bs4 import BeautifulSoup
@@ -29,6 +30,22 @@ def pelear_contra_troll(enemy, conn=None):
     return respuesta_pelea(conn.getresponse())
 
 
+def get_info_troll(enemy, conn=None):
+
+    if not conn:
+        conn = HTTPConnection(DOMAIN)
+
+    headers = make_header('world/{}'.format(enemy['id_world']), explorar=True)
+    params = encodear_parametro({'id_troll': enemy['id_troll']})
+
+    conn.request('GET', '/battle.html?' + params, headers=headers)
+    descomprimido = respuesta_unzip_http(conn.getresponse())
+
+    soup = BeautifulSoup(descomprimido, 'html.parser')
+    set_relativo = soup.find_all('div', class_='slot girl-slot')
+    enemy['chicas_cautivas'] = len(set_relativo) // 2
+    return enemy
+
 def definir_oponente(conn=None):
     """
     Hace request para ver que troll, ordenado de menor a mayor aun tiene alguna chica cautiva
@@ -36,19 +53,21 @@ def definir_oponente(conn=None):
     Sino se instancia una nueva
     :return: El troll de nivel mas bajo que aun tenga una chica cautiva
     """
+    lista_enemigos = ENEMIGOS
+
     if not conn:
         conn = HTTPConnection(DOMAIN)
-    for enemy in ENEMIGOS:
-        headers = make_header('world/{}'.format(enemy['id_world']), explorar=True)
-        params = encodear_parametro({'id_troll': enemy['id_troll']})
 
-        conn.request('GET', '/battle.html?'+params, headers=headers)
-        descomprimido = respuesta_unzip_http(conn.getresponse())
+    if len(argv) >= 2:
+        lista_hidratada = list(map(get_info_troll, filter( lambda x: str(x['id_troll']) in argv[1:], ENEMIGOS )))
 
-        soup = BeautifulSoup(descomprimido, 'html.parser')
-        set_relativo = soup.find_all('div', class_='slot girl-slot')
+    if reduce(lambda c,x: c + x['chicas_cautivas'], lista_hidratada, 0) > 0:
+        lista_enemigos = lista_hidratada
 
-        if len(set_relativo) // 2 != 0:
+    for enemy in lista_enemigos:
+        enemy = get_info_troll(enemy, conn)
+
+        if enemy['chicas_cautivas'] != 0:
             return enemy
 
 
@@ -89,7 +108,7 @@ def pelear():
     no_es_dinero = list(filter(_dict, respuestas))
 
     total = reduce(lambda c, x: c + x, es_dinero, 0)
-    print("\nRecaudaste $", total)
+    print("Recaudaste $", total)
 
     if no_es_dinero:
         print("\nY tambien conseguiste otras cosas\n")
@@ -108,5 +127,7 @@ def _dict(elem):
     return isinstance(elem, dict)
 
 
-print(definir_enemigo_arena())
+# print(definir_enemigo_arena())
+# print(len(argv))
+# print(definir_oponente())
 pelear()
