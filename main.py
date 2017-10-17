@@ -53,8 +53,7 @@ def get_info_cantidad_energia(conn=HTTPConnection(DOMAIN)):
     descomprimido = respuesta_unzip_http(conn.getresponse())
 
     soup = BeautifulSoup(descomprimido, 'html.parser')
-    energia = soup.find('header')
-    energia = energia.find('span', {'hero': 'energy_fight'})
+    energia = soup.find('span', {'hero': 'energy_fight'})
     try:
         return int(energia.string)
     except:
