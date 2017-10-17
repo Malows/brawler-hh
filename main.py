@@ -46,6 +46,21 @@ def get_info_troll(enemy, conn=None):
     enemy['chicas_cautivas'] = len(set_relativo) // 2
     return enemy
 
+
+def get_info_cantidad_energia(conn=HTTPConnection(DOMAIN)):
+    headers = make_header('home.html', True)
+    conn.request('GET', '/home.html', headers=headers)
+    descomprimido = respuesta_unzip_http(conn.getresponse())
+
+    soup = BeautifulSoup(descomprimido, 'html.parser')
+    energia = soup.find('header')
+    energia = energia.find('span', {'hero': 'energy_fight'})
+    try:
+        return int(energia.string)
+    except:
+        return energia.string
+
+
 def definir_oponente(conn=None):
     """
     Hace request para ver que troll, ordenado de menor a mayor aun tiene alguna chica cautiva
@@ -60,9 +75,8 @@ def definir_oponente(conn=None):
 
     if len(argv) >= 2:
         lista_hidratada = list(map(get_info_troll, filter( lambda x: str(x['id_troll']) in argv[1:], ENEMIGOS )))
-
-    if reduce(lambda c,x: c + x['chicas_cautivas'], lista_hidratada, 0) > 0:
-        lista_enemigos = lista_hidratada
+        if reduce(lambda c,x: c + x['chicas_cautivas'], lista_hidratada, 0) > 0:
+            lista_enemigos = lista_hidratada
 
     for enemy in lista_enemigos:
         enemy = get_info_troll(enemy, conn)
@@ -101,14 +115,15 @@ def pelear():
     """
     conn = HTTPConnection(DOMAIN)
     enemy = definir_oponente(conn)
+    energia = get_info_cantidad_energia(conn)
 
-    respuestas = list(filter(_str_energy, [pelear_contra_troll(enemy, conn) for _ in range(10)]))
+    respuestas = list(filter(_str_energy, [pelear_contra_troll(enemy, conn) for _ in range(energia // 2)]))
 
     es_dinero = list(filter(_numero, respuestas))
     no_es_dinero = list(filter(_dict, respuestas))
 
     total = reduce(lambda c, x: c + x, es_dinero, 0)
-    print("Recaudaste $", total)
+    print("Recaudaste de {} $ {}".format(enemy['nombre'], total))
 
     if no_es_dinero:
         print("\nY tambien conseguiste otras cosas\n")
