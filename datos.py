@@ -20,9 +20,9 @@ ENEMIGOS = [
         'id_troll': 2,
         'nombre': 'Ninja Spy',
         'orgasm': 5618,
-        'ego': 2076.32,
+        'ego': 2617.32,
         'x': 0,
-        'd': 2076.32,
+        'd': 2617.32,
         'nb_org': 0,
         'figure': 12,
         'id_world': 3
@@ -56,5 +56,36 @@ ENEMIGOS = [
         'nb_org': 0,
         'figure': 1,
         'id_world': 6
+    }, {
+        'id_troll': 6,
+        'nombre': 'Silvanus',
+        'orgasm': 14641,
+        'ego': 5972.48,
+        'x': 0,
+        'd': 5972.48,
+        'nb_org': 0,
+        'figure': 11,
+        'id_world': 7
+    }, {
+        'id_troll': 7,
+        'nombre': 'Bremen',
+        'orgasm': 16361,
+        'ego': 6195.28,
+        'x': 0,
+        'd': 6195.28,
+        'nb_org': 0,
+        'figure': 1,
+        'id_world': 8
+    }, {
+        'id_troll': 8,
+        'nombre': 'Finalmecia',
+        'orgasm': 13395,
+        'ego': 6394.56,
+        'x': 0,
+        'd': 6394.56,
+        'nb_org': 0,
+        'figure': 12,
+        'id_world': 9
     }
+
 ]

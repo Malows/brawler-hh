@@ -25,7 +25,6 @@ def parsear_parametros_para_enemigo(enemy):
         'who[id_world]': enemy['id_world']
     }
 
-
 def encodear_parametro(param):
     """ Encodea un diccionario de parametros para ser enviado por POST/PUT/DELETE """
     return urlencode(param)
